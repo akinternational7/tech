@@ -285,3 +285,63 @@ serviceCards.forEach(card => {
 // ===== CONSOLE MESSAGE =====
 console.log('%c🚀 Welcome to AkTech! ', 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 20px; padding: 10px; border-radius: 5px;');
 console.log('%cWebsite built with ❤️ by AkTech Development Team', 'color: #2563eb; font-size: 14px;');
+
+// ===== CUSTOM CURSOR TRAIL EFFECT =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Create cursor elements
+    const cursorDot = document.createElement('div');
+    const cursorOutline = document.createElement('div');
+    
+    cursorDot.className = 'cursor-dot';
+    cursorOutline.className = 'cursor-outline';
+    
+    document.body.appendChild(cursorDot);
+    document.body.appendChild(cursorOutline);
+    
+    let mouseX = 0, mouseY = 0;
+    let outlineX = 0, outlineY = 0;
+    
+    // Track mouse position
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        cursorDot.style.left = mouseX + 'px';
+        cursorDot.style.top = mouseY + 'px';
+    });
+    
+    // Smooth follow effect for outline
+    function animateCursor() {
+        outlineX += (mouseX - outlineX) * 0.15;
+        outlineY += (mouseY - outlineY) * 0.15;
+        
+        cursorOutline.style.left = outlineX + 'px';
+        cursorOutline.style.top = outlineY + 'px';
+        
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    
+    // Add hover effect on interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, .btn, input, textarea, select');
+    
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            cursorDot.style.transform = 'translate(-50%, -50%) scale(2)';
+            cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+    });
+    
+    // Hide default cursor on desktop
+    if (window.innerWidth > 768) {
+        document.body.style.cursor = 'none';
+        document.querySelectorAll('a, button, .btn, input, textarea, select').forEach(el => {
+            el.style.cursor = 'none';
+        });
+    }
+});
