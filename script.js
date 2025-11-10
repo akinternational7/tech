@@ -283,8 +283,8 @@ serviceCards.forEach(card => {
 });
 
 // ===== CONSOLE MESSAGE =====
-console.log('%c🚀 Welcome to AkTech! ', 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 20px; padding: 10px; border-radius: 5px;');
-console.log('%cWebsite built with ❤️ by AkTech Development Team', 'color: #2563eb; font-size: 14px;');
+console.log('%c🚀 Welcome to AKI Tech! ', 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 20px; padding: 10px; border-radius: 5px;');
+console.log('%cWebsite built with ❤️ by AKI Tech Development Team', 'color: #2563eb; font-size: 14px;');
 
 // ===== CUSTOM CURSOR TRAIL EFFECT =====
 document.addEventListener('DOMContentLoaded', function() {
