@@ -1,6 +1,6 @@
-# AkTech - Tech Company Website
+# AKI Tech - Tech Company Website
 
-A complete, modern, and responsive website for AkTech - an innovative technology solutions company.
+A complete, modern, and responsive website for AKI Tech - an innovative technology solutions company.
 
 ## 📋 Features
 
@@ -24,7 +24,7 @@ A complete, modern, and responsive website for AkTech - an innovative technology
 ## 📁 Project Structure
 
 ```
-aktech/
+akitech/
 ├── index.html          # Homepage
 ├── about.html          # About page
 ├── services.html       # Services page
@@ -133,7 +133,7 @@ The contact form currently logs to console. To make it functional, connect it to
 Update these in all HTML files (footer section):
 - Address: 123 Tech Street, Silicon Valley
 - Phone: +1 (555) 123-4567
-- Email: info@aktech.com
+- Email: info@akitech.com
 
 ## 🌐 Browser Support
 
@@ -152,8 +152,8 @@ Feel free to fork this project and customize it for your needs!
 
 ## 📞 Support
 
-For questions or support, contact us at info@aktech.com
+For questions or support, contact us at info@akitech.com
 
 ---
 
-**Built with ❤️ by AkTech Development Team**
+**Built with ❤️ by AKI Tech Development Team**
