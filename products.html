@@ -24,6 +24,21 @@
                 <li><a href="products.html" class="active">Products</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+            <div class="currency-selector">
+                <i class="fas fa-globe"></i>
+                <select id="currencySelect" class="currency-dropdown">
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="AUD">AUD ($)</option>
+                    <option value="CAD">CAD ($)</option>
+                    <option value="SGD">SGD ($)</option>
+                    <option value="AED">AED (د.إ)</option>
+                    <option value="SAR">SAR (﷼)</option>
+                    <option value="JPY">JPY (¥)</option>
+                </select>
+            </div>
             <div class="hamburger">
                 <span></span>
                 <span></span>
@@ -57,7 +72,7 @@
                     </div>
                     <h3>InventoryPro</h3>
                     <p class="product-description">Complete inventory management solution with full pro functionality</p>
-                    <p class="product-price">Starting from <strong>₹750/month</strong></p>
+                    <p class="product-price">Starting from <strong><span class="currency" data-price-inr="750">₹</span><span class="amount" data-price-inr="750">750</span>/month</strong></p>
                     <ul class="product-features">
                         <li><i class="fas fa-check"></i> Real-time stock tracking</li>
                         <li><i class="fas fa-check"></i> Barcode scanning</li>
@@ -241,6 +256,21 @@
                 </div>
             </div>
             <div class="footer-bottom">
+                <div class="footer-currency">
+                    <span>Currency:</span>
+                    <select id="currencySelectFooter" class="currency-dropdown-footer">
+                        <option value="INR">INR (₹)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="AUD">AUD ($)</option>
+                        <option value="CAD">CAD ($)</option>
+                        <option value="SGD">SGD ($)</option>
+                        <option value="AED">AED (د.إ)</option>
+                        <option value="SAR">SAR (﷼)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
+                </div>
                 <p>&copy; 2025 AKI Tech. All rights reserved.</p>
             </div>
         </div>

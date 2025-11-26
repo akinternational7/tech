@@ -52,47 +52,68 @@ const contactForm = document.getElementById('contactForm');
 const formMessage = document.getElementById('formMessage');
 
 if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Get form values
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            company: document.getElementById('company').value,
-            service: document.getElementById('service').value,
-            budget: document.getElementById('budget').value,
-            message: document.getElementById('message').value
-        };
+        // Get form data
+        const formData = new FormData(contactForm);
 
         // Basic validation
-        if (!formData.name || !formData.email || !formData.message) {
+        const name = formData.get('name');
+        const email = formData.get('email');
+        const message = formData.get('message');
+
+        if (!name || !email || !message) {
             showMessage('Please fill in all required fields.', 'error');
             return;
         }
 
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.email)) {
+        if (!emailRegex.test(email)) {
             showMessage('Please enter a valid email address.', 'error');
             return;
         }
 
-        // Simulate form submission
-        // In production, you would send this data to your server
-        console.log('Form submitted:', formData);
+        // Show loading state
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Sending...';
+        submitButton.disabled = true;
 
-        // Show success message
-        showMessage('Thank you for your message! We will get back to you within 24 hours.', 'success');
+        try {
+            // Submit form to Web3Forms
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
 
-        // Reset form
-        contactForm.reset();
+            const data = await response.json();
 
-        // Hide message after 5 seconds
-        setTimeout(() => {
-            formMessage.style.display = 'none';
-        }, 5000);
+            if (data.success) {
+                // Show success message
+                showMessage('Thank you for your message! We will get back to you within 24 hours.', 'success');
+                
+                // Reset form
+                contactForm.reset();
+            } else {
+                throw new Error(data.message || 'Something went wrong');
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            showMessage('Sorry, there was an error sending your message. Please try again or email us directly at info@akint.co.in', 'error');
+        } finally {
+            // Restore button state
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+
+            // Hide message after 8 seconds
+            setTimeout(() => {
+                if (formMessage) {
+                    formMessage.style.display = 'none';
+                }
+            }, 8000);
+        }
     });
 }
 
@@ -345,3 +366,218 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ===== CURRENCY CONVERSION SYSTEM =====
+(function() {
+    // Exchange rates relative to INR (base currency)
+    const exchangeRates = {
+        INR: 1,
+        USD: 0.012,    // 1 INR = 0.012 USD
+        EUR: 0.011,    // 1 INR = 0.011 EUR
+        GBP: 0.0095,   // 1 INR = 0.0095 GBP
+        AUD: 0.018,    // 1 INR = 0.018 AUD
+        CAD: 0.016,    // 1 INR = 0.016 CAD
+        SGD: 0.016,    // 1 INR = 0.016 SGD
+        AED: 0.044,    // 1 INR = 0.044 AED
+        SAR: 0.045,    // 1 INR = 0.045 SAR
+        JPY: 1.79      // 1 INR = 1.79 JPY
+    };
+
+    // Currency symbols
+    const currencySymbols = {
+        INR: '₹',
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        AUD: '$',
+        CAD: '$',
+        SGD: '$',
+        AED: 'د.إ',
+        SAR: '﷼',
+        JPY: '¥'
+    };
+
+    // Country to currency mapping
+    const countryToCurrency = {
+        IN: 'INR',
+        US: 'USD',
+        GB: 'GBP',
+        EU: 'EUR',
+        AU: 'AUD',
+        CA: 'CAD',
+        SG: 'SGD',
+        AE: 'AED',
+        SA: 'SAR',
+        JP: 'JPY'
+    };
+
+    let currentCurrency = 'INR';
+    let detectedCurrency = 'INR';
+
+    // Detect user's country and set currency
+    async function detectUserCurrency() {
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            const countryCode = data.country_code;
+            
+            // Map country to currency
+            detectedCurrency = countryToCurrency[countryCode] || 'INR';
+            
+            // Check if user has saved preference
+            const savedCurrency = localStorage.getItem('preferredCurrency');
+            if (savedCurrency) {
+                currentCurrency = savedCurrency;
+            } else {
+                currentCurrency = detectedCurrency;
+                localStorage.setItem('preferredCurrency', currentCurrency);
+            }
+        } catch (error) {
+            console.log('Could not detect location, using INR');
+            currentCurrency = localStorage.getItem('preferredCurrency') || 'INR';
+        }
+
+        // Update dropdowns and prices
+        updateCurrencySelectors();
+        convertAllPrices();
+    }
+
+    // Update both currency dropdowns
+    function updateCurrencySelectors() {
+        const navSelector = document.getElementById('currencySelect');
+        const footerSelector = document.getElementById('currencySelectFooter');
+
+        if (navSelector) navSelector.value = currentCurrency;
+        if (footerSelector) footerSelector.value = currentCurrency;
+    }
+
+    // Convert price from INR to target currency
+    function convertPrice(inrPrice, targetCurrency) {
+        const rate = exchangeRates[targetCurrency];
+        const convertedPrice = inrPrice * rate;
+        
+        // Format based on currency
+        let formattedPrice;
+        if (targetCurrency === 'JPY') {
+            formattedPrice = Math.round(convertedPrice).toLocaleString();
+        } else {
+            formattedPrice = convertedPrice.toFixed(2);
+        }
+        
+        return {
+            symbol: currencySymbols[targetCurrency],
+            amount: formattedPrice,
+            currency: targetCurrency
+        };
+    }
+
+    // Find and convert all prices on the page
+    function convertAllPrices() {
+        // Find elements with price data
+        const priceElements = document.querySelectorAll('[data-price-inr]');
+        
+        priceElements.forEach(element => {
+            const inrPrice = parseFloat(element.getAttribute('data-price-inr'));
+            const converted = convertPrice(inrPrice, currentCurrency);
+            
+            // Update the element's content
+            if (element.classList.contains('currency')) {
+                element.textContent = converted.symbol;
+            } else if (element.classList.contains('amount')) {
+                element.textContent = converted.amount;
+            } else {
+                // Full price display
+                element.innerHTML = `${converted.symbol}${converted.amount}`;
+            }
+        });
+
+        // Also update any text nodes containing ₹750
+        updatePriceInText();
+    }
+
+    // Update prices in text content (for elements without data attributes)
+    function updatePriceInText() {
+        const converted = convertPrice(750, currentCurrency);
+        
+        // Update hero price tags
+        const heroPrice = document.querySelector('.hero-price strong');
+        if (heroPrice) {
+            heroPrice.textContent = `${converted.symbol}${converted.amount}/month`;
+        }
+
+        // Update price tags
+        const priceTags = document.querySelectorAll('.price-tag strong');
+        priceTags.forEach(tag => {
+            tag.textContent = `${converted.symbol}${converted.amount}/month`;
+        });
+
+        // Update pricing card amounts
+        const priceAmounts = document.querySelectorAll('.price .amount');
+        priceAmounts.forEach(amount => {
+            const inrValue = parseFloat(amount.getAttribute('data-price-inr')) || 750;
+            const converted = convertPrice(inrValue, currentCurrency);
+            amount.textContent = converted.amount;
+        });
+
+        // Update currency symbols in pricing
+        const currencySpans = document.querySelectorAll('.price .currency');
+        currencySpans.forEach(span => {
+            span.textContent = currencySymbols[currentCurrency];
+        });
+    }
+
+    // Handle currency change
+    function handleCurrencyChange(event) {
+        const newCurrency = event.target.value;
+        currentCurrency = newCurrency;
+        
+        // Save preference
+        localStorage.setItem('preferredCurrency', newCurrency);
+        
+        // Sync both dropdowns
+        updateCurrencySelectors();
+        
+        // Convert all prices
+        convertAllPrices();
+    }
+
+    // Initialize currency system
+    function initCurrency() {
+        // Add event listeners to both selectors
+        const navSelector = document.getElementById('currencySelect');
+        const footerSelector = document.getElementById('currencySelectFooter');
+
+        if (navSelector) {
+            navSelector.addEventListener('change', handleCurrencyChange);
+        }
+
+        if (footerSelector) {
+            footerSelector.addEventListener('change', handleCurrencyChange);
+        }
+
+        // Add data-price-inr to pricing elements if not present
+        addPriceAttributes();
+
+        // Detect user currency and convert
+        detectUserCurrency();
+    }
+
+    // Add data-price-inr attributes to pricing elements
+    function addPriceAttributes() {
+        // Find all price amounts and add INR base value
+        const priceElements = document.querySelectorAll('.price .amount');
+        priceElements.forEach(element => {
+            if (!element.hasAttribute('data-price-inr')) {
+                element.setAttribute('data-price-inr', '750');
+            }
+        });
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCurrency);
+    } else {
+        initCurrency();
+    }
+})();
+
